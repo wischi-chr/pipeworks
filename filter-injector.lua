@@ -21,6 +21,11 @@ local function set_filter_formspec(data, meta)
 				{"Sequence slots by Priority",
 				 "Sequence slots Randomly",
 				 "Sequence slots by Rotation"})..
+			fs_helpers.cycling_button(meta, "button[4,3.5;4,1", "timeinject_mode",
+				{"Timeinject disabled",
+				 "Timeinject every 1s",
+				 "Timeinject every 5s",
+				 "Timeinject every 10s"})..
 			"list[current_player;main;0,4.5;8,4;]"
 	meta:set_string("formspec", formspec)
 end
@@ -215,6 +220,31 @@ for _, data in ipairs({
 		tube = {connect_sides = {right = 1}},
 		on_punch = function (pos, node, puncher)
 			punch_filter(data, pos, node)
+		end,
+	})
+	
+	minetest.register_abm({
+		nodenames = {"pipeworks:"..data.name},
+		interval = 1.0,
+		chance = 1,
+		action = function(pos, node, active_object_count, active_object_count_wider)
+			local filtmeta = minetest.get_meta(pos)
+			local timeinject_mode = filtmeta:get_int("timeinject_mode")
+			local counter = filtmeta:get_int("timeinject_count") or 0
+			local sec
+			
+			if     timeinject_mode == 1 then sec = 1  
+			elseif timeinject_mode == 2 then sec = 5  
+			elseif timeinject_mode == 3 then sec = 10 
+			else return end
+			
+			counter = counter + 1
+			if counter >= sec then
+				punch_filter(data, pos, node)
+				counter = 0
+			end
+			
+			filtmeta:set_int("timeinject_count",counter)
 		end,
 	})
 end
