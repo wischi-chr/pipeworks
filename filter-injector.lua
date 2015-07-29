@@ -13,6 +13,7 @@ end
 local function set_filter_formspec(data, meta)
 	local itemname = data.wise_desc.." Filter-Injector"
 	local formspec = "size[8,8.5]"..
+			default.gui_bg..default.gui_bg_img..default.gui_slots..
 			"item_image[0,0;1,1;pipeworks:"..data.name.."]"..
 			"label[1,0;"..minetest.formspec_escape(itemname).."]"..
 			"label[0,1;Prefer item types:]"..
